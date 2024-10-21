@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 import { NewsCategory } from "@customTypes/index";
 
-export interface News {
+export interface NewsType extends Document {
   _id: mongoose.Types.ObjectId;
   title: string;
   description: string;
@@ -11,7 +11,7 @@ export interface News {
   updatedAt: string;
 }
 
-export const newsSchema = new mongoose.Schema<News>({
+export const newsSchema = new mongoose.Schema<NewsType>({
   _id: mongoose.Schema.Types.ObjectId,
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -21,4 +21,4 @@ export const newsSchema = new mongoose.Schema<News>({
   updatedAt: { type: String, required: true, default: () => dayjs().toISOString() },
 });
 
-export const News = mongoose.model("News", newsSchema);
+export const NewsModel = mongoose.model("News", newsSchema);

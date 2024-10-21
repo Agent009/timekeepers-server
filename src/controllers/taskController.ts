@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 import { constants } from "@lib/constants";
 import { getServerUrl } from "@lib/util";
-import { Task } from "@models/task";
+import { TaskModel } from "@models/taskModel";
 
 const tasksUrl = getServerUrl(constants.routes.tasks);
 
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getRecords = (req, res, next) => {
-  Task.find()
+  TaskModel.find()
     .exec()
     .then((docs) => {
       console.log("taskController -> getRecords -> docs", docs);
@@ -39,7 +39,7 @@ export const getRecords = (req, res, next) => {
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const createRecord = (req, res, next) => {
-  const task = new Task({
+  const task = new TaskModel({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     updatedAt: req.body.updatedAt,
@@ -73,7 +73,7 @@ export const createRecord = (req, res, next) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const deleteRecord = (req, res, next) => {
   const id = req.params.recordId;
-  Task.deleteOne({ _id: id })
+  TaskModel.deleteOne({ _id: id })
     .exec()
     .then((result) => {
       console.log("taskController -> deleteRecord -> result", result);

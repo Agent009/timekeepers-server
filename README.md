@@ -38,5 +38,14 @@ pm2 logs tk-server
 ### Non-PM2 Approach
 
 ```bash
+npm run dev
 npm run start
 ```
+
+## Fetching & Saving News
+
+The following will fetch the latest 20 headlines and save them in the DB, ready for further processing.
+
+````bash
+GET http://localhost:3001/news/fetch-save/top-headlines
+````

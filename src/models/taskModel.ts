@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
-export interface Task {
+export interface TaskType extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   updatedAt: number;
 }
 
-export const taskSchema = new mongoose.Schema<Task>({
+export const taskSchema = new mongoose.Schema<TaskType>({
   _id: mongoose.Schema.Types.ObjectId,
   name: { type: String, required: true },
   updatedAt: { type: Number, required: true, default: Date.now },
 });
 
-export const Task = mongoose.model("Task", taskSchema);
+export const TaskModel = mongoose.model("Task", taskSchema);

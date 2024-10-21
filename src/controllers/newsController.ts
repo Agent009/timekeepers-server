@@ -1,22 +1,66 @@
 import dayjs from "dayjs";
 import mongoose, { UpdateQuery } from "mongoose";
 import { constants } from "@lib/constants";
+import { getTopHeadlines } from "@lib/newsAPI";
 import { getServerUrl } from "@lib/util";
-import { News } from "@models/news";
+import { create } from "@middleware/repository";
+import { NewsModel, NewsType } from "@models/news";
 
 const newsUrl = getServerUrl(constants.routes.news);
+
+//region NewsAPI
+// @ts-expect-error ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const fetchAndSaveTopHeadlines = (req, res, next) => {
+  console.log("newsController -> fetchAndSaveTopHeadlines");
+  getTopHeadlines()
+    .then((articles) => {
+      let saved = 0;
+      let failed = 0;
+      articles.forEach(async (article) => {
+        const record = await create<NewsType>(NewsModel, {
+          _id: new mongoose.Types.ObjectId(),
+          title: article.title,
+          description: article.description || article.title,
+        });
+
+        if (record) {
+          console.log("newsController -> fetchAndSaveTopHeadlines -> saved article", record);
+          saved++;
+        } else {
+          console.error("newsController -> fetchAndSaveTopHeadlines -> failed to save article", article);
+          failed++;
+        }
+      });
+
+      res.status(201).json({
+        message: "Articles fetched and saved successfully",
+        data: {
+          saved: saved,
+          failed: failed,
+        },
+      });
+    })
+    .catch((err) => {
+      console.error("newsController -> fetchAndSaveTopHeadlines -> err", err);
+      res.status(500).json({
+        error: err,
+      });
+    });
+};
+//endregion
+
+//region CRUD route handlers
 
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const createRecord = (req, res, next) => {
-  const record = new News({
+  create<NewsType>(NewsModel, {
     _id: new mongoose.Types.ObjectId(),
     title: req.body.title,
     description: req.body.description,
     categories: req.body.categories,
-  });
-  record
-    .save()
+  })
     .then((result) => {
       console.log("newsController -> createRecord -> result", result);
       res.status(201).json({
@@ -26,8 +70,8 @@ export const createRecord = (req, res, next) => {
           request: {
             description: "Fetch record",
             type: "GET",
-            id: result._id,
-            url: newsUrl + result._id,
+            id: result?._id,
+            url: newsUrl + result?._id,
           },
         },
       });
@@ -44,7 +88,7 @@ export const createRecord = (req, res, next) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getRecord = (req, res, next) => {
   const id = req.params.recordId;
-  News.findOne({ _id: id })
+  NewsModel.findOne({ _id: id })
     .exec()
     .then((doc) => {
       console.log("newsController -> getRecord -> doc", doc);
@@ -72,7 +116,7 @@ export const getRecord = (req, res, next) => {
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getRecords = (req, res, next) => {
-  News.find()
+  NewsModel.find()
     .exec()
     .then((docs) => {
       console.log("newsController -> getRecords -> docs", docs);
@@ -104,7 +148,7 @@ export const getRecords = (req, res, next) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateRecord = (req, res, next) => {
   const id = req.params.recordId;
-  const update: UpdateQuery<News> = {
+  const update: UpdateQuery<NewsType> = {
     updatedAt: dayjs().toISOString(),
   };
 
@@ -121,7 +165,7 @@ export const updateRecord = (req, res, next) => {
   }
 
   // { new: true } returns the updated document
-  News.findOneAndUpdate({ _id: id }, update, { new: true })
+  NewsModel.findOneAndUpdate({ _id: id }, update, { new: true })
     .then((result) => {
       console.log("newsController -> updateRecord -> result", result);
 
@@ -157,7 +201,7 @@ export const updateRecord = (req, res, next) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const deleteRecord = (req, res, next) => {
   const id = req.params.recordId;
-  News.deleteOne({ _id: id })
+  NewsModel.deleteOne({ _id: id })
     .exec()
     .then((result) => {
       console.log("newsController -> deleteRecord -> result", result);
@@ -172,3 +216,5 @@ export const deleteRecord = (req, res, next) => {
       });
     });
 };
+
+//endregion
