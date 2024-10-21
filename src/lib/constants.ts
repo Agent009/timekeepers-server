@@ -61,4 +61,9 @@ export const constants = Object.freeze({
   misc: {
     YMD_DATE_FORMAT: "y-MM-dd",
   },
+  integrations: {
+    newsAPI: {
+      apiKey: process.env.NEWSAPI_API_KEY || "",
+    },
+  },
 });
