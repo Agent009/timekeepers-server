@@ -1,0 +1,75 @@
+{
+  "name": "tk-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "format": "prettier --check \"**/*.[jt]s?(x)\"",
+    "format:fix": "prettier --write \"**/*.[jt]s?(x)\"",
+    "lint": "eslint . --report-unused-disable-directives",
+    "lint:fix": "eslint . --fix",
+    "check-types": "tsc --noEmit",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "test": "jest --coverage --runInBand --detectOpenHandles",
+    "test-no-coverage": "jest --runInBand --detectOpenHandles",
+    "deploy:local": "pm2 start pm2.config.js --env local --no-daemon",
+    "deploy:dev": "pm2 start pm2.config.js --env dev",
+    "deploy:prod": "npm run build && pm2 start pm2.config.js --env prod",
+    "start": "node dist/server.ts",
+    "dev": "nodemon -r tsconfig-paths/register src/server.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.4",
+    "axios": "^1.7.7",
+    "axios-retry": "^4.5.0",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
+    "cron": "^3.1.7",
+    "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.2",
+    "newsapi": "^2.4.1",
+    "nodemailer": "^6.9.15",
+    "puppeteer": "^23.6.0",
+    "tsconfig-paths": "^4.2.0",
+    "validator": "^13.12.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.7",
+    "concurrently": "^9.0.1",
+    "eslint": "^9",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.11.0",
+    "husky": "^9.0.11",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.2.2",
+    "mongodb-memory-server": "^10.1.2",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.10.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write \"**/*.[jt]s?(x)\""
+    ]
+  },
+  "engines": {
+    "node": "^18.18.0 || >=20.16.0"
+  }
+}
