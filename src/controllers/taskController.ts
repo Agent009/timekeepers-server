@@ -1,16 +1,17 @@
 import mongoose from "mongoose";
-import { Task } from "@api/models/task";
+import { constants } from "@lib/constants";
 import { getServerUrl } from "@lib/util";
+import { Task } from "@models/task";
 
-const tasksUrl = getServerUrl("tasks");
+const tasksUrl = getServerUrl(constants.routes.tasks);
 
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const get_tasks = (req, res, next) => {
+export const getRecords = (req, res, next) => {
   Task.find()
     .exec()
     .then((docs) => {
-      console.log(docs);
+      console.log("taskController -> getRecords -> docs", docs);
       const response = {
         count: docs.length,
         data: docs.map((doc) => {
@@ -28,7 +29,7 @@ export const get_tasks = (req, res, next) => {
       res.status(200).json(response);
     })
     .catch((err) => {
-      console.log(err);
+      console.error("taskController -> getRecords -> err", err);
       res.status(500).json({
         error: err,
       });
@@ -37,7 +38,7 @@ export const get_tasks = (req, res, next) => {
 
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const create_task = (req, res, next) => {
+export const createRecord = (req, res, next) => {
   const task = new Task({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
@@ -46,9 +47,9 @@ export const create_task = (req, res, next) => {
   task
     .save()
     .then((result) => {
-      console.log(result);
+      console.log("taskController -> createRecord -> result", result);
       res.status(201).json({
-        message: "Task created successfully",
+        message: "Record created successfully",
         data: {
           _id: result._id,
           name: result.name,
@@ -61,7 +62,7 @@ export const create_task = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.error("taskController -> createRecord -> err", err);
       res.status(500).json({
         error: err,
       });
@@ -70,14 +71,14 @@ export const create_task = (req, res, next) => {
 
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const delete_task = (req, res, next) => {
-  const id = req.params.taskId;
+export const deleteRecord = (req, res, next) => {
+  const id = req.params.recordId;
   Task.deleteOne({ _id: id })
     .exec()
     .then((result) => {
-      console.log(result);
+      console.log("taskController -> deleteRecord -> result", result);
       res.status(200).json({
-        message: "Task deleted successfully",
+        message: "Record deleted successfully",
         request: {
           type: "POST",
           url: tasksUrl,
@@ -89,7 +90,7 @@ export const delete_task = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.error("taskController -> deleteRecord -> err", err);
       res.status(500).json({
         error: err,
       });

@@ -4,7 +4,7 @@ import { constants } from "@lib/constants";
 
 const newsAPI = new NewsAPI(constants.integrations.newsAPI.apiKey);
 
-export function getTopHeadlines() {
+export const getTopHeadlines = () => {
   // To query /v2/top-headlines
   // All options passed to topHeadlines are optional, but you need to include at least one of them
   newsAPI.v2
@@ -33,9 +33,9 @@ export function getTopHeadlines() {
       });
       console.log("Articles", data);
     });
-}
+};
 
-export function getEverything() {
+export const getEverything = () => {
   // To query /v2/everything
   // You must include at least one q, source, or domain
   newsAPI.v2
@@ -66,9 +66,9 @@ export function getEverything() {
         };
       });
     });
-}
+};
 
-export function getSources() {
+export const getSources = () => {
   // To query sources
   // All options are optional
   newsAPI.v2
@@ -87,4 +87,4 @@ export function getSources() {
       }
     */
     });
-}
+};

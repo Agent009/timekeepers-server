@@ -52,6 +52,11 @@ export const constants = Object.freeze({
       TASK: "Task",
     },
   },
+  routes: {
+    home: "/",
+    news: "news",
+    tasks: "tasks",
+  },
   tasks: {
     DEFAULT_CF_TASK_ENTRIES_SYNC_DAYS: process.env.DEFAULT_CF_TASK_ENTRIES_SYNC_DAYS || 1,
     DEFAULT_RB_TASK_COMMENT_SYNC_DAYS: process.env.DEFAULT_RB_TASK_COMMENT_SYNC_DAYS || 1,
