@@ -15,12 +15,13 @@
     "deploy:local": "pm2 start pm2.config.js --env local --no-daemon",
     "deploy:dev": "pm2 start pm2.config.js --env dev",
     "deploy:prod": "npm run build && pm2 start pm2.config.js --env prod",
-    "start": "node dist/server.ts",
-    "dev": "nodemon -r tsconfig-paths/register src/server.ts"
+    "start": "dotenvx run -- ts-node -r tsconfig-paths/register src/server.ts",
+    "dev": "dotenvx run -- nodemon -r tsconfig-paths/register src/server.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.20.0",
     "@sendgrid/mail": "^8.1.4",
     "axios": "^1.7.7",
     "axios-retry": "^4.5.0",
@@ -30,7 +31,6 @@
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
-    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.2",

@@ -1,5 +1,4 @@
 import express, { Express, Request, Response } from "express";
-import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import taskRoutes from "@api/routes/task";
 import { corsErrorHandler } from "@lib/corsErrorHandler";
@@ -8,7 +7,6 @@ import { handleError, handleNotFound } from "@lib/errorHandler";
 import { isObject } from "@lib/util";
 import tasks from "@tasks/tasks";
 
-dotenv.config();
 const app: Express = express();
 
 //Middlewares
@@ -40,10 +38,9 @@ app.use(handleError);
 // console.log(tasks);
 
 if (isObject(tasks)) {
-  // @ts-expect-error ignore
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [taskName, task] of Object.entries(tasks)) {
     // Start each task individually.
+    console.log("app -> starting task", taskName);
     // @ts-expect-error ignore
     task.start();
   }

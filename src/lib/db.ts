@@ -10,7 +10,7 @@ const options = { appName: constants.app.name };
 const isDevelopment = constants.env.devOrLocal;
 // @ts-expect-error ignore
 let isConnected = (isDevelopment && global._mongooseConnection) || false;
-console.log("mongodb -> isDevelopment", isDevelopment, "isConnected", isConnected);
+console.log("mongodb -> uri", constants.db.mongodbUri, "isDevelopment", isDevelopment, "isConnected", isConnected);
 
 export const connectDB = async () => {
   // If already connected, resolve immediately

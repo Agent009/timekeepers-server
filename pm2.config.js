@@ -4,21 +4,21 @@ let argEnv = (argEnvIndex !== -1 && process.argv[argEnvIndex + 1]) || "";
 
 const RUN_ENV_MAP = {
   local: {
-    script: "./src/server.ts",
+    script: "dotenvx run -- nodemon -r tsconfig-paths/register src/server.ts",
     instances: 1,
     max_memory_restart: "250M",
     // args: '--ignore-watch="node_modules"'
     args: "",
   },
   dev: {
-    script: "nodemon ./src/server.ts",
+    script: "dotenvx run -- nodemon -r tsconfig-paths/register src/server.ts",
     instances: 1,
     max_memory_restart: "250M",
     // args: '--ignore-watch="node_modules"'
     args: "",
   },
   prod: {
-    script: "./src/server.ts",
+    script: "dotenvx run -- node src/server.ts",
     instances: 1,
     max_memory_restart: "1000M",
     args: "",
