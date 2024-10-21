@@ -32,7 +32,7 @@ To check the active running logs, use the following command:
 ```bash
 pm2 logs [APP_NAME]
 -- E.g. --
-pm2 logs invoices-server
+pm2 logs tk-server
 ```
 
 ### Non-PM2 Approach

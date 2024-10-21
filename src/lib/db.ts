@@ -1,34 +1,43 @@
 import mongoose from "mongoose";
 import { constants } from "@lib/constants";
 
-/**
- * Connect to MongoDB
- * @returns {*} The DB connection
- */
-export const connectDB = () => {
-  const url = constants.db.mongodbUri || "";
+if (!constants.db.mongodbUri) {
+  throw new Error("Add MONGODB_URI to .env / .env.local");
+}
 
-  try {
-    mongoose.connect(url);
-  } catch (err) {
-    // @ts-expect-error ignore
-    console.error(`Error connecting to DB: ${err?.message}`);
-    process.exit(1);
+const options = { appName: constants.app.name };
+// Track the connection state to avoid unnecessary reconnects
+const isDevelopment = constants.env.devOrLocal;
+// @ts-expect-error ignore
+let isConnected = (isDevelopment && global._mongooseConnection) || false;
+console.log("mongodb -> isDevelopment", isDevelopment, "isConnected", isConnected);
+
+export const connectDB = async () => {
+  // If already connected, resolve immediately
+  if (isConnected) {
+    return Promise.resolve(true);
   }
 
-  const dbConnection = mongoose.connection;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  dbConnection.once("open", (_) => {
-    console.log(`DB connected: ${url}`);
-  });
+  try {
+    const { connection } = await mongoose.connect(constants.db.mongodbUri as string, options);
 
-  dbConnection.on("error", (err) => {
-    console.error(`DB connection error: ${err}`);
-  });
+    if (connection.readyState === 1) {
+      isConnected = true;
 
-  dbConnection.on("message", (err) => {
-    console.error(`DB connection message: ${err}`);
-  });
+      // Cache the connection globally in development
+      if (isDevelopment) {
+        // @ts-expect-error ignore
+        global._mongooseConnection = isConnected;
+      }
 
-  return dbConnection;
+      console.log("mongodb -> connected!");
+      return Promise.resolve(true);
+    }
+
+    console.log("mongodb -> connection state:", connection.readyState);
+    return Promise.reject("Error connecting to MongoDB");
+  } catch (error) {
+    console.error("mongodb -> connection error:", error);
+    return Promise.reject(error);
+  }
 };

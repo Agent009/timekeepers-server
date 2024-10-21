@@ -1,3 +1,5 @@
+const name = "Timekeepers Server";
+const caption = "Tomorrow, Today!";
 // Environment
 const environment = process.env.NODE_ENV || "development";
 const localEnv = environment === "local";
@@ -28,6 +30,13 @@ export const constants = Object.freeze({
     host: tksServerHost,
     port: tksServerPort,
     url: tksServerUrl,
+  },
+  app: {
+    id: "cx-tk-server",
+    name: name,
+    caption: caption,
+    productionUrl: "https://connextar.com",
+    repoUrl: "https://github.com/Agent009/timekeepers-server",
   },
   db: {
     // MongoDB
