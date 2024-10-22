@@ -5,7 +5,7 @@ import { constants } from "@lib/constants";
 import { getTopHeadlines } from "@lib/newsAPI";
 import { initializeOpenAI } from "@lib/util";
 import { create, listAllOrNullOnError, update } from "@middleware/repository";
-import { NewsModel, NewsType } from "@models/news";
+import { NewsModel, NewsDocument } from "@models/news";
 
 const openai = initializeOpenAI();
 type PerformResponse = {
@@ -14,7 +14,7 @@ type PerformResponse = {
   message?: string | null;
 };
 
-const perform = async (article: NewsType): Promise<PerformResponse> => {
+const perform = async (article: NewsDocument): Promise<PerformResponse> => {
   try {
     const caetgories = Object.values(NewsCategory).join(", ");
     const { text } = await generateText({
@@ -51,7 +51,7 @@ const perform = async (article: NewsType): Promise<PerformResponse> => {
   }
 };
 
-const performInParallel = async (articles: NewsType[]) => {
+const performInParallel = async (articles: NewsDocument[]) => {
   let timer = new Date().getTime();
   const completedRequests: string[] = [];
   console.log(`tasks -> newsTasks -> performInParallel -> configuring ${articles?.length} requests.`);
@@ -104,7 +104,7 @@ export const fetchNewsArticles = async () => {
       let saved = 0;
       let failed = 0;
       articles.forEach(async (article) => {
-        const record = await create<NewsType>(NewsModel, {
+        const record = await create<NewsDocument>(NewsModel, {
           _id: new mongoose.Types.ObjectId(),
           title: article.title,
           description: article.description || article.title,
@@ -140,7 +140,7 @@ export const categoriseNewsArticles = async () => {
   });
 
   if (!articles || !articles.length) {
-    message = "No news articles found.";
+    message = "No news articles require categorisation.";
     console.log("tasks -> newsTasks -> categoriseNewsArticles ->", message);
     return message;
   }
@@ -156,7 +156,7 @@ export const categoriseNewsArticles = async () => {
     // A batch is either limited by the batch size or it is smaller than the batch size when there are fewer items required
     const endIndex = total < reqNo + MAX_BATCH_SIZE ? total : reqNo + MAX_BATCH_SIZE;
     // const reqs = endIndex - reqNo;
-    const concurrentReqs: NewsType[] = [];
+    const concurrentReqs: NewsDocument[] = [];
     // console.log(`${reqNo} / ${total} - endIndex: ${endIndex}, reqs: ${reqs}`);
 
     for (let index = reqNo; index < endIndex; index++) {

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { constants } from "@lib/constants";
 import { getServerUrl } from "@lib/util";
-import { TaskModel } from "@models/taskModel";
+import { TaskModel } from "@models/task";
 
 const tasksUrl = getServerUrl(constants.routes.tasks);
 

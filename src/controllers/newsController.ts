@@ -4,7 +4,7 @@ import { constants } from "@lib/constants";
 import { getTopHeadlines } from "@lib/newsAPI";
 import { getServerUrl } from "@lib/util";
 import { create } from "@middleware/repository";
-import { NewsModel, NewsType } from "@models/news";
+import { NewsModel, NewsDocument } from "@models/news";
 
 const newsUrl = getServerUrl(constants.routes.news);
 
@@ -18,7 +18,7 @@ export const fetchAndSaveTopHeadlines = (req, res, next) => {
       let saved = 0;
       let failed = 0;
       articles.forEach(async (article) => {
-        const record = await create<NewsType>(NewsModel, {
+        const record = await create<NewsDocument>(NewsModel, {
           _id: new mongoose.Types.ObjectId(),
           title: article.title,
           description: article.description || article.title,
@@ -56,7 +56,7 @@ export const fetchAndSaveTopHeadlines = (req, res, next) => {
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const createRecord = (req, res, next) => {
-  create<NewsType>(NewsModel, {
+  create<NewsDocument>(NewsModel, {
     _id: new mongoose.Types.ObjectId(),
     title: req.body.title,
     description: req.body.description,
@@ -150,7 +150,7 @@ export const getRecords = (req, res, next) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updateRecord = (req, res, next) => {
   const id = req.params.recordId;
-  const update: UpdateQuery<NewsType> = {
+  const update: UpdateQuery<NewsDocument> = {
     updatedAt: dayjs().toISOString(),
   };
 
