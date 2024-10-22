@@ -36,7 +36,7 @@ export const getTopHeadlines = (
             description: article.description,
           };
         });
-        console.log("Articles", data);
+        console.log("newsAPI -> getTopHeadlines -> articles", data);
         return data;
       })
       // @ts-expect-error ignore

@@ -1,9 +1,10 @@
 import { CronJob } from "cron";
 import { constants } from "@lib/constants";
 import { isObject } from "@lib/util";
+import { fetchNewsArticles, categoriseNewsArticles } from "@tasks/newsTasks";
 
 const NEXT_SCHEDULED_NO = 1;
-const tasks = {};
+const tasks: Record<string, CronJob> = {};
 const commonProperties = {
   onComplete: null,
   runOnInit: false,
@@ -11,6 +12,8 @@ const commonProperties = {
   timeZone: "Europe/London",
 };
 const syncInitTaskName = "syncInit";
+const fetchNewsArticlesTaskName = "fetchNewsArticles";
+const categoriseNewsArticlesTaskName = "categoriseNewsArticles";
 const taskMonitorTaskName = "taskMonitor";
 /**
  * If set to TRUE, it means we want to set up the initial data, so we should run all the sync tasks turn by turn and
@@ -26,8 +29,13 @@ const initTasksDefinitionCommonParams = {
   executions: 0,
 };
 const initTasksDefinition = {
-  ["init"]: {
+  [categoriseNewsArticlesTaskName]: {
     order: 1,
+    ...initTasksDefinitionCommonParams,
+    cronSeconds: 0,
+  },
+  [fetchNewsArticlesTaskName]: {
+    order: 2,
     ...initTasksDefinitionCommonParams,
     cronSeconds: 0,
   },
@@ -38,10 +46,9 @@ const initTasksDefinition = {
  * NOTE: The "cronTime" contains a seconds element, so be careful when doing conversions from tools like crontab guru,
  * as you will need to put in the seconds element as well.
  */
-//region Sync Tasks - Init
+//region Tasks - Init
 //==========))) SYNC DATA TASKS - INIT (((==========\\
 if (runInitTasks) {
-  // @ts-expect-error ignore
   tasks[syncInitTaskName] = CronJob.from({
     cronTime: "0 * * * * *",
     onTick: async function () {
@@ -75,7 +82,7 @@ if (runInitTasks) {
 
 //endregion
 
-//region Sync Tasks - Task Monitor
+//region Tasks - Task Monitor
 //==========))) TASK MONITOR (((==========\\
 // Keep this at the end, so that it can monitor all the other tasks.
 const taskMonitor = CronJob.from({
@@ -87,11 +94,9 @@ const taskMonitor = CronJob.from({
     if (isObject(tasks)) {
       for (const [taskName, task] of Object.entries(tasks)) {
         console.log(
-          // @ts-expect-error ignore
           `---CRON--- ${taskName} - Schedule: ${task.cronTime}, Running: ${task.running}, Last Executed: ${task
             .lastDate()
             ?.toISOString()}, Next Execution: `,
-          // @ts-expect-error ignore
           scheduleDatesFormatted(task.nextDates(1)),
         );
       }
@@ -102,12 +107,51 @@ const taskMonitor = CronJob.from({
   },
   ...commonProperties,
 });
-// @ts-expect-error ignore
 tasks[taskMonitorTaskName] = taskMonitor;
 
 //endregion
 
-//region Sync Tasks - Misc
+//region Tasks - News
+//==========))) TASKS - NEWS (((==========\\
+const categoriseNewsArticlesTask = CronJob.from({
+  cronTime: constants.tasks.CATEGORISE_NEWS_ARTICLES_CRON,
+  onTick: async function () {
+    console.log("==========))) BEGIN: CRON - CATEGORISE NEWS ARTICLES (((==========");
+
+    if (runInitTasks) {
+      console.log("---CRON--- Skipping due to init task being set to run first.");
+      return;
+    }
+
+    await runTaskByName(categoriseNewsArticlesTaskName);
+    console.log("---CRON--- Next scheduled executions: ", scheduleDatesFormatted(this.nextDates(NEXT_SCHEDULED_NO)));
+    console.log("==========))) END: CRON - CATEGORISE NEWS ARTICLES (((==========");
+  },
+  ...commonProperties,
+});
+tasks[categoriseNewsArticlesTaskName] = categoriseNewsArticlesTask; // Usually takes about x.x seconds to complete.
+
+const fetchNewsArticlesTask = CronJob.from({
+  cronTime: constants.tasks.FETCH_NEWS_ARTICLES_CRON,
+  onTick: async function () {
+    console.log("==========))) BEGIN: CRON - FETCH NEWS ARTICLES (((==========");
+
+    if (runInitTasks) {
+      console.log("---CRON--- Skipping due to init task being set to run first.");
+      return;
+    }
+
+    await runTaskByName(fetchNewsArticlesTaskName);
+    console.log("---CRON--- Next scheduled executions: ", scheduleDatesFormatted(this.nextDates(NEXT_SCHEDULED_NO)));
+    console.log("==========))) END: CRON - FETCH NEWS ARTICLES (((==========");
+  },
+  ...commonProperties,
+});
+tasks[fetchNewsArticlesTaskName] = fetchNewsArticlesTask; // Usually takes about x.x seconds to complete.
+
+//endregion
+
+//region Tasks - Misc
 //==========))) SUPPORTING / MISC STUFF (((==========\\
 /**
  * @param {import("luxon").DateTime<boolean>[]} nextDates
@@ -153,10 +197,14 @@ const runTaskByName = async (taskName: string): Promise<string> => {
   let response;
 
   switch (taskName) {
-    case "init":
-      response = await (async () => {
-        return "success";
-      })();
+    case categoriseNewsArticlesTaskName:
+      // response = await (async () => {
+      //   return "success";
+      // })();
+      response = await categoriseNewsArticles();
+      break;
+    case fetchNewsArticlesTaskName:
+      response = await fetchNewsArticles();
       break;
   }
 

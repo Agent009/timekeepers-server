@@ -49,3 +49,20 @@ The following will fetch the latest 20 headlines and save them in the DB, ready 
 ````bash
 GET http://localhost:3001/news/fetch-save/top-headlines
 ````
+
+## Crons
+
+The cron schedules are controlled through environment variables.
+Currently, we have the following crons activated:
+
+* `FETCH_NEWS_ARTICLES_CRON` - fetches top headlines hourly.
+* `CATEGORISE_NEWS_ARTICLES_CRON` - categorises articles that are pending categorisation every 10 minutes.
+
+The cron definitions are stored in [src/tasks/tasks.ts](src/tasks/tasks.ts).
+
+The crons are defined in two configurations:
+
+* `Init` Tasks - these tasks run on application startup, provided that the `SETUP_INIT_DATA` environment variable is set. This is useful for bootstrapping data and initial runs.
+* `Scheduled` Tasks - these run based on configured schedules from the environment variables.
+
+There is a `Task Monitor` cron that runs regularly and reports on cron stats including last execution and upcoming execution date. 

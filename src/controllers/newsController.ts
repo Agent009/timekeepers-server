@@ -22,6 +22,7 @@ export const fetchAndSaveTopHeadlines = (req, res, next) => {
           _id: new mongoose.Types.ObjectId(),
           title: article.title,
           description: article.description || article.title,
+          categorised: false,
         });
 
         if (record) {
@@ -60,6 +61,7 @@ export const createRecord = (req, res, next) => {
     title: req.body.title,
     description: req.body.description,
     categories: req.body.categories,
+    categorised: false,
   })
     .then((result) => {
       console.log("newsController -> createRecord -> result", result);
@@ -162,6 +164,10 @@ export const updateRecord = (req, res, next) => {
 
   if (req.body?.categories) {
     update.categories = req.body.categories;
+  }
+
+  if (req.body?.categorised !== undefined) {
+    update.categorised = req.body.categorised === "true" || req.body.categorised === true;
   }
 
   // { new: true } returns the updated document

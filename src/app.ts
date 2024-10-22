@@ -44,7 +44,6 @@ if (isObject(tasks)) {
   for (const [taskName, task] of Object.entries(tasks)) {
     // Start each task individually.
     console.log("app -> starting task", taskName);
-    // @ts-expect-error ignore
     task.start();
   }
 }

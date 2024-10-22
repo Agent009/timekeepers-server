@@ -58,17 +58,35 @@ export const constants = Object.freeze({
     tasks: "tasks",
   },
   tasks: {
-    DEFAULT_CF_TASK_ENTRIES_SYNC_DAYS: process.env.DEFAULT_CF_TASK_ENTRIES_SYNC_DAYS || 1,
-    DEFAULT_RB_TASK_COMMENT_SYNC_DAYS: process.env.DEFAULT_RB_TASK_COMMENT_SYNC_DAYS || 1,
     TASK_MONITOR_CRON: process.env.TASK_MONITOR_CRON || "0 */10 * * * *", // Default: Second 0 of every 10th minute
     SETUP_INIT_DATA: process.env.SETUP_INIT_DATA === "true" || parseInt(process.env.SETUP_INIT_DATA || "") === 1, // Do we want to run the tasks for an initial setup?
+    FETCH_NEWS_ARTICLES_CRON: process.env.FETCH_NEWS_ARTICLES_CRON || "15 1 */1 * * *", //  Default: Minute 1 of every hour
+    CATEGORISE_NEWS_ARTICLES_CRON: process.env.CATEGORISE_NEWS_ARTICLES_CRON || "30 */10 * * * *", //  Default: Second 30 of every 10th minute
   },
   misc: {
     YMD_DATE_FORMAT: "y-MM-dd",
   },
+  // 3rd Party, Integrations
   integrations: {
     newsAPI: {
       apiKey: process.env.NEWSAPI_API_KEY || "",
+    },
+    openAI: {
+      useLocal: "true" === process.env.USE_LOCAL_AI,
+      localBaseURL: process.env.LOCAL_AI_BASE_URL || "",
+      apiKey: process.env.OPENAI_API_KEY || "",
+      models: {
+        chat: process.env.OPENAI_CHAT_MODEL || "gpt-4o-mini",
+      },
+      temperature: 0.5,
+      maxTokens: 500,
+      promptTypes: {
+        chat: "chat",
+      },
+      response: {
+        default: "default",
+        streaming: "streaming",
+      },
     },
   },
 });
