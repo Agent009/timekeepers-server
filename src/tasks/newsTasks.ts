@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { convertToCoreMessages, generateText } from "ai";
-import { NewsCategory } from "@customTypes/index";
+import { NewsCategory, PerformResponse } from "@customTypes/index";
 import { constants } from "@lib/constants";
 import { getTopHeadlines } from "@lib/newsAPI";
 import { initializeOpenAI } from "@lib/util";
@@ -8,13 +8,8 @@ import { create, listAllOrNullOnError, update } from "@middleware/repository";
 import { NewsModel, NewsDocument } from "@models/news";
 
 const openai = initializeOpenAI();
-type PerformResponse = {
-  success: boolean;
-  data?: string | null;
-  message?: string | null;
-};
 
-const perform = async (article: NewsDocument): Promise<PerformResponse> => {
+const categorise = async (article: NewsDocument): Promise<PerformResponse> => {
   try {
     const caetgories = Object.values(NewsCategory).join(", ");
     const { text } = await generateText({
@@ -31,14 +26,14 @@ const perform = async (article: NewsDocument): Promise<PerformResponse> => {
       ]),
     });
     const data = text?.replace("Categories:", "")?.replace(/\s+/g, "")?.trim()?.toLowerCase()?.split(",");
-    console.log("tasks -> newsTasks -> perform -> text", text, "categories", data);
+    console.log("tasks -> newsTasks -> categorise -> text", text, "categories", data);
 
     // Save the categorisation to the database
     await update(NewsModel, { _id: article._id }, { categories: data, categorised: true });
 
     return { success: true, data: text, message: "News categorisation performed successfully" };
   } catch (error: unknown) {
-    console.error("tasks -> newsTasks -> perform -> error", error);
+    console.error("tasks -> newsTasks -> categorise -> error", error);
 
     return {
       success: false,
@@ -51,10 +46,10 @@ const perform = async (article: NewsDocument): Promise<PerformResponse> => {
   }
 };
 
-const performInParallel = async (articles: NewsDocument[]) => {
+const categoriseInParallel = async (articles: NewsDocument[]) => {
   let timer = new Date().getTime();
   const completedRequests: string[] = [];
-  console.log(`tasks -> newsTasks -> performInParallel -> configuring ${articles?.length} requests.`);
+  console.log(`tasks -> newsTasks -> categoriseInParallel -> configuring ${articles?.length} requests.`);
   let stopFurtherRequests = false;
 
   // Create an array of Promises for each request
@@ -64,32 +59,37 @@ const performInParallel = async (articles: NewsDocument[]) => {
     }
 
     try {
-      const response = await perform(article);
+      const response = await categorise(article);
 
       if (response.success && response.data) {
         completedRequests.push(response.data);
       } else {
-        console.error(`tasks -> newsTasks -> performInParallel -> article (${article?.id}) failed`, response.message);
+        console.error(
+          `tasks -> newsTasks -> categoriseInParallel -> article (${article?.id}) failed`,
+          response.message,
+        );
 
         if (response.message === "maxRetriesExceeded") {
           stopFurtherRequests = true;
-          console.error("tasks -> newsTasks -> performInParallel -> Stopping further requests");
+          console.error("tasks -> newsTasks -> categoriseInParallel -> Stopping further requests");
         }
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error(`tasks -> newsTasks -> performInParallel -> article (${article?.id}) error: ${error?.message}`);
+        console.error(
+          `tasks -> newsTasks -> categoriseInParallel -> article (${article?.id}) error: ${error?.message}`,
+        );
       } else {
-        console.error(`tasks -> newsTasks -> performInParallel -> article (${article?.id}) error:`, error);
+        console.error(`tasks -> newsTasks -> categoriseInParallel -> article (${article?.id}) error:`, error);
       }
     }
   });
 
   // Wait for all promises to resolve (requests to complete)
-  console.log("tasks -> newsTasks -> performInParallel -> Requests configured. Awaiting responses...");
+  console.log("tasks -> newsTasks -> categoriseInParallel -> Requests configured. Awaiting responses...");
   await Promise.all(requestPromises);
   timer = new Date().getTime() - timer;
-  console.log(`tasks -> newsTasks -> performInParallel -> Responses received in ${timer} ms...`);
+  console.log(`tasks -> newsTasks -> categoriseInParallel -> Responses received in ${timer} ms...`);
 
   // Return the list of completed requests
   return completedRequests;
@@ -170,7 +170,7 @@ export const categoriseNewsArticles = async () => {
 
     // wait until all promises are done or one promise is rejected
     // await Promise.all(concurrentReqs);
-    const results = await performInParallel(concurrentReqs);
+    const results = await categoriseInParallel(concurrentReqs);
     completedRequests.push(...results);
     console.log(
       `tasks -> newsTasks -> categoriseNewsArticles -> Requests ${

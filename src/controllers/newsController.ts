@@ -1,13 +1,15 @@
-import dayjs from "@lib/dayjsConfig";
+import { convertToCoreMessages, generateText } from "ai";
 import mongoose, { UpdateQuery } from "mongoose";
+import { EpochType, NewsCategory, PerformResponse } from "@customTypes/index";
 import { constants } from "@lib/constants";
+import dayjs from "@lib/dayjsConfig";
 import { getTopHeadlines } from "@lib/newsAPI";
-import { getServerUrl } from "@lib/util";
-import { create, listAllOrNullOnError } from "@middleware/repository";
+import { getServerUrl, initializeOpenAI } from "@lib/util";
 import { NewsModel, NewsDocument } from "@models/news";
-import { EpochType, NewsCategory } from "@customTypes/index";
+import { create, listAllOrNullOnError } from "@middleware/repository";
 
 const newsUrl = getServerUrl(constants.routes.news);
+const openai = initializeOpenAI();
 
 //region NewsAPI
 // @ts-expect-error ignore
@@ -54,6 +56,42 @@ export const fetchAndSaveTopHeadlines = (req, res, next) => {
 
 //region Aggregation & Misc Logic
 
+const generatePrompt = async (category: NewsCategory, articles: NewsDocument[]): Promise<PerformResponse> => {
+  try {
+    const description = articles
+      ?.map((r) => r.description || r.title)
+      ?.join("\n")
+      ?.slice(0, 3000);
+    const { text } = await generateText({
+      model: openai(constants.integrations.openAI.models.chat),
+      messages: convertToCoreMessages([
+        {
+          role: "system",
+          content: `For the ${category} news category, analyze the following news article descriptions which are seperated by newline, and generate a suitable image generation prompt to repsent these articles. Be descriptive and specific.
+            Only return the image genration prompt. Do not return any other output.
+            Article Descriptions: ${description}
+            Prompt: [The prompt]`,
+        },
+      ]),
+    });
+    const data = text?.replace("Prompt:", "")?.trim();
+    console.log("tasks -> newsTasks -> generatePrompt -> text", text, "prompt", data);
+
+    return { success: true, data: text, message: "Image generation promot generated successfully" };
+  } catch (error: unknown) {
+    console.error("tasks -> newsTasks -> generatePrompt -> error", error);
+
+    return {
+      success: false,
+      data: null,
+      message:
+        error instanceof Error && "reason" in error && error.reason === "maxRetriesExceeded"
+          ? "maxRetriesExceeded"
+          : `Error generating image generation prompt. ${error instanceof Error && error?.message}`,
+    };
+  }
+};
+
 // @ts-expect-error ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getMintData = async (req, res, next) => {
@@ -96,6 +134,11 @@ export const getMintData = async (req, res, next) => {
       });
     });
 
+    // Remove "general" from the counts if there are other categories present.
+    if (categoryCount[NewsCategory.General] !== undefined && Object.keys(categoryCount).length > 1) {
+      delete categoryCount[NewsCategory.General];
+    }
+
     // Determine the most popular category
     const mostPopularCategory: NewsCategory =
       Object.keys(categoryCount).length > 0
@@ -112,15 +155,21 @@ export const getMintData = async (req, res, next) => {
     // Fetch random articles from the most popular category
     const selectedArticles = mostPopularCategory
       ? articles
-          .filter((article) => article.categories && article.categories.includes(mostPopularCategory))
+          .filter(
+            (article) => article.categorised && article.categories && article.categories.includes(mostPopularCategory),
+          )
           .sort(() => 0.5 - Math.random()) // Shuffle the articles
           .slice(0, articlesToPick) // Pick the specified number of articles
       : [];
+
+    // Compose an image generation prompt from the titles and descriptions of these articles.
+    const result = await generatePrompt(mostPopularCategory, articles);
 
     res.status(200).json({
       epochType: epochType,
       startDate: startDate,
       endDate: endDate,
+      prompt: result?.success ? result?.data : "",
       category: mostPopularCategory,
       articles: selectedArticles,
     });

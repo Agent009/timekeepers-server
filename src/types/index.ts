@@ -45,3 +45,9 @@ export interface UpdateOptions {
   runValidators?: boolean; // Run validators on update
   context?: string; // Query context
 }
+
+export type PerformResponse = {
+  success: boolean;
+  data?: string | null;
+  message?: string | null;
+};
