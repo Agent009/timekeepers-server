@@ -142,14 +142,17 @@ export const getMintData = async (req, res, next) => {
     // Determine the most popular category
     const mostPopularCategory: NewsCategory =
       Object.keys(categoryCount).length > 0
-        ? (Object.keys(categoryCount).reduce((a, b) => {
-            // Ensure both a and b are valid keys
-            return categoryCount[a] !== undefined &&
-              categoryCount[b] !== undefined &&
-              categoryCount[a] > categoryCount[b]
-              ? a
-              : b;
-          }) as NewsCategory)
+        ? // FIXME: Uncomment for actual logic. Picks most popular category.
+          // ? (Object.keys(categoryCount).reduce((a, b) => {
+          //     // Ensure both a and b are valid keys
+          //     return categoryCount[a] !== undefined &&
+          //       categoryCount[b] !== undefined &&
+          //       categoryCount[a] > categoryCount[b]
+          //       ? a
+          //       : b;
+          //   }) as NewsCategory)
+          // FIXME: Uncomment for testing purposes only. Picks random category instead of the most popular one.
+          (Object.keys(categoryCount).sort(() => 0.5 - Math.random())?.[0] as NewsCategory)
         : NewsCategory.General;
 
     // Fetch random articles from the most popular category
@@ -163,7 +166,7 @@ export const getMintData = async (req, res, next) => {
       : [];
 
     // Compose an image generation prompt from the titles and descriptions of these articles.
-    const result = await generatePrompt(mostPopularCategory, articles);
+    const result = await generatePrompt(mostPopularCategory, selectedArticles);
 
     res.status(200).json({
       epochType: epochType,
