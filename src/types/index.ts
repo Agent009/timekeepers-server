@@ -1,3 +1,11 @@
+export enum EpochType {
+  Minute = "minute",
+  Hour = "hour",
+  Day = "day",
+  Month = "month",
+  Year = "year",
+}
+
 export enum NewsCategory {
   General = "general",
   Sports = "sports",

@@ -64,7 +64,8 @@ export const constants = Object.freeze({
     CATEGORISE_NEWS_ARTICLES_CRON: process.env.CATEGORISE_NEWS_ARTICLES_CRON || "30 */10 * * * *", //  Default: Second 30 of every 10th minute
   },
   misc: {
-    YMD_DATE_FORMAT: "y-MM-dd",
+    YMD_DATE_FORMAT: "YYYY-MM-DD",
+    YMDHM_DATE_FORMAT: "YYYY-MM-DD HH:mm",
   },
   // 3rd Party, Integrations
   integrations: {

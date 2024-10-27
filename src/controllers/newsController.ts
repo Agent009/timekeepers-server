@@ -1,10 +1,11 @@
-import dayjs from "dayjs";
+import dayjs from "@lib/dayjsConfig";
 import mongoose, { UpdateQuery } from "mongoose";
 import { constants } from "@lib/constants";
 import { getTopHeadlines } from "@lib/newsAPI";
 import { getServerUrl } from "@lib/util";
-import { create } from "@middleware/repository";
+import { create, listAllOrNullOnError } from "@middleware/repository";
 import { NewsModel, NewsDocument } from "@models/news";
+import { EpochType, NewsCategory } from "@customTypes/index";
 
 const newsUrl = getServerUrl(constants.routes.news);
 
@@ -49,6 +50,88 @@ export const fetchAndSaveTopHeadlines = (req, res, next) => {
       });
     });
 };
+//endregion
+
+//region Aggregation & Misc Logic
+
+// @ts-expect-error ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getMintData = async (req, res, next) => {
+  // For articles over the given date range, determine the most popular category.
+  // If multiple categories are determined, pick one at random.
+  // For the picked category, fetch x random articles within the given date range.
+  // Return the determined category and the associated selected articles.
+  const epochType: EpochType = req.query?.epochType || EpochType.Minute;
+  const startDateObj: dayjs.Dayjs = req.query?.startDate
+    ? // @ts-expect-error ignore
+      dayjs.utc(req.query.startDate.replace(" ", "T"))
+    : // @ts-expect-error ignore
+      dayjs().utc();
+  // @ts-expect-error ignore
+  const endDateObj: dayjs.Dayjs = req.query?.endDate ? dayjs.utc(req.query.endDate.replace(" ", "T")) : dayjs().utc();
+  const startDate: Date = startDateObj.toDate();
+  const endDate: Date = endDateObj.toDate();
+  const articlesToPick: number = 5;
+  console.log("newsController -> getMintData -> epoch", epochType, startDate, endDate);
+
+  try {
+    // Fetch articles within the date range
+    const articles = await listAllOrNullOnError(NewsModel, {
+      createdAt: { $gte: startDate, $lte: endDate },
+    });
+
+    if (!articles || articles.length === 0) {
+      return res.status(404).json({
+        message: "No articles found for the given date range.",
+        category: null,
+        articles: [],
+      });
+    }
+
+    // Count categories
+    const categoryCount: { [key: string]: number } = {};
+    articles.forEach((article) => {
+      article.categories.forEach((category) => {
+        categoryCount[category] = (categoryCount[category] || 0) + 1;
+      });
+    });
+
+    // Determine the most popular category
+    const mostPopularCategory: NewsCategory =
+      Object.keys(categoryCount).length > 0
+        ? (Object.keys(categoryCount).reduce((a, b) => {
+            // Ensure both a and b are valid keys
+            return categoryCount[a] !== undefined &&
+              categoryCount[b] !== undefined &&
+              categoryCount[a] > categoryCount[b]
+              ? a
+              : b;
+          }) as NewsCategory)
+        : NewsCategory.General;
+
+    // Fetch random articles from the most popular category
+    const selectedArticles = mostPopularCategory
+      ? articles
+          .filter((article) => article.categories && article.categories.includes(mostPopularCategory))
+          .sort(() => 0.5 - Math.random()) // Shuffle the articles
+          .slice(0, articlesToPick) // Pick the specified number of articles
+      : [];
+
+    res.status(200).json({
+      epochType: epochType,
+      startDate: startDate,
+      endDate: endDate,
+      category: mostPopularCategory,
+      articles: selectedArticles,
+    });
+  } catch (err) {
+    console.error("newsController -> determineMintData -> err", err);
+    res.status(500).json({
+      error: err,
+    });
+  }
+};
+
 //endregion
 
 //region CRUD route handlers
