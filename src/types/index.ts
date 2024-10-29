@@ -6,6 +6,41 @@ export enum EpochType {
   Year = "year",
 }
 
+export enum EpochState {
+  Past = "past",
+  Present = "present",
+  Future = "future",
+}
+
+export enum EpochStatus {
+  Active = "active",
+  Queued = "queued",
+  Generating = "generating",
+  Generated = "generated",
+}
+
+export enum EpochRarity {
+  Common = "common",
+  Rare = "rare",
+  Epic = "epic",
+  Legendary = "legendary",
+}
+
+export interface EpochData {
+  type: EpochType;
+  value: number;
+  isoDate: string; // string in ISO 8601 format
+  ymdDate: string; // string in YYYY-MM-DD format
+  ymdhmDate: string; // string in YYYY-MM-DD HH:mm format
+  state: EpochState;
+  status: EpochStatus;
+  seed?: number | null;
+  prompt?: string | null;
+  image?: string | null;
+  nft?: string | null;
+  rarity?: EpochRarity;
+}
+
 export enum NewsCategory {
   General = "general",
   Sports = "sports",
@@ -17,6 +52,14 @@ export enum NewsCategory {
 export interface NewsArticle {
   title: string;
   description: string;
+}
+
+export enum LayerCategory {
+  General = "general",
+  Sports = "sports",
+  Science = "science",
+  Technology = "technology",
+  Entertainment = "entertainment",
 }
 
 // Define a custom error type for validation errors
