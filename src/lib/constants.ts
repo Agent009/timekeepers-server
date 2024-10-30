@@ -55,6 +55,7 @@ export const constants = Object.freeze({
   routes: {
     home: "/",
     epoch: "epoch",
+    layer: "layer",
     news: "news",
     tasks: "tasks",
   },

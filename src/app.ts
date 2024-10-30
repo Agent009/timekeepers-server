@@ -6,6 +6,7 @@ import { connectDB } from "@lib/db";
 import { handleError, handleNotFound } from "@lib/errorHandler";
 import { isObject } from "@lib/util";
 import epochRoutes from "@routes/epoch";
+import layerRoutes from "@routes/layer";
 import newsRoutes from "@routes/news";
 import taskRoutes from "@routes/task";
 import tasks from "@tasks/tasks";
@@ -30,6 +31,7 @@ connectDB();
 
 // Routes which should handle requests
 app.use(`/${constants.routes.epoch}`, epochRoutes);
+app.use(`/${constants.routes.layer}`, layerRoutes);
 app.use(`/${constants.routes.news}`, newsRoutes);
 app.use(`/${constants.routes.tasks}`, taskRoutes);
 
