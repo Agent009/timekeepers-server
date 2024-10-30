@@ -54,6 +54,7 @@ export const constants = Object.freeze({
   },
   routes: {
     home: "/",
+    epoch: "epoch",
     news: "news",
     tasks: "tasks",
   },

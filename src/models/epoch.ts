@@ -63,10 +63,8 @@ const EpochSchema = new Schema<EpochDocument>(
   },
 );
 
-const EpochModel = mongoose.models?.Epoch || model<EpochDocument>("Epoch", EpochSchema);
+export const EpochModel = mongoose.models?.Epoch || model<EpochDocument>("Epoch", EpochSchema);
 
 export async function updateEpochesWithDefaultLayer(defaultLayerId: mongoose.Types.ObjectId) {
   await EpochModel.updateMany({}, { $set: { layerId: defaultLayerId } });
 }
-
-export default EpochModel;

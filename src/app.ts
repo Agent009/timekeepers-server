@@ -5,6 +5,7 @@ import { corsErrorHandler } from "@lib/corsErrorHandler";
 import { connectDB } from "@lib/db";
 import { handleError, handleNotFound } from "@lib/errorHandler";
 import { isObject } from "@lib/util";
+import epochRoutes from "@routes/epoch";
 import newsRoutes from "@routes/news";
 import taskRoutes from "@routes/task";
 import tasks from "@tasks/tasks";
@@ -28,6 +29,7 @@ app.get("/", (req: Request, res: Response) => {
 connectDB();
 
 // Routes which should handle requests
+app.use(`/${constants.routes.epoch}`, epochRoutes);
 app.use(`/${constants.routes.news}`, newsRoutes);
 app.use(`/${constants.routes.tasks}`, taskRoutes);
 
