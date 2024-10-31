@@ -3,6 +3,11 @@
 The TK server is responsible for running scheduled crons and providing a CRUD API.
 
 ## Architecture
+
+* [**TK Server**](https://github.com/Agent009/timekeepers-server) (this) - back-end functionality, crons, CRUD API, AI.
+* [**TK Client**](https://github.com/Agent009/timekeepers-client) - front-end UX, web3 DApp, countdown timers.
+* **TK Agents** - in development. Complicated multi-step and multi-tool workflows such as agnent orchestration (e.g. generating videos).
+
 ### Data Structure
 
 * **Layers** organise **epochs** into context-specific domains, such as world news or user-controlled applications such as a board game stream.
