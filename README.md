@@ -101,7 +101,8 @@ npm run start
 
 ## Roadmap
 
-* Refactor CRUD logic from client to server
+* Refactor CRUD logic from client to server.
+* Secure the API (e.g. JWT).
 * Remove all MongoDB interaction from the client. This should solely happen in the server.
 * Add web socket functionality for a more robust PubSub.
 * Relocate **Livepeer** functionality from client to server.
