@@ -99,6 +99,18 @@ npm run dev
 npm run start
 ```
 
+### Story Protocol
+
+The server uses the [TypeScript SDK](https://docs.story.foundation/docs/typescript-sdk) from [Story](https://www.story.foundation/) protocol.
+You will need to set the `Story Protocol` associated environment variables to ensure the NFTs are minted properly.
+After setting up the environment variables as per the requirements, you should run:
+
+```bash
+npm run create-spg-collection
+```
+
+This will create a new SPG NFT collection which is required for consequent minting actions.
+
 ## Roadmap
 
 * Refactor CRUD logic from client to server.
@@ -107,6 +119,7 @@ npm run start
 * Add web socket functionality for a more robust PubSub.
 * Relocate **Livepeer** functionality from client to server.
 * Migrate to using **NestJS** for more robust enterprise support.
-* Add **Story Protocol** integration.
+* Optimise the **Story Protocol** integration.
   * Deploy bespoke NFT contract
+  * Deploy bespoke PIL terms
 * Add **Zora Protocol** integration.
