@@ -1,7 +1,7 @@
 import { http, createWalletClient, createPublicClient, Address, formatEther } from "viem";
 import { odyssey } from "@story-protocol/core-sdk";
-import { NFTContractAddress, RPCProviderUrl, account } from "@story-scripts/utils";
-import { defaultNftContractAbi } from "@story-scripts/utils/defaultNftContractAbi";
+import { NFTContractAddress, RPCProviderUrl, account } from "@story/utils";
+import { defaultNftContractAbi } from "@story/utils/defaultNftContractAbi";
 
 const baseConfig = {
   chain: odyssey,

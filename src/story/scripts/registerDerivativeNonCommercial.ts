@@ -1,7 +1,7 @@
 import { RegisterIpAndMakeDerivativeResponse, RegisterIpResponse, StoryClient } from "@story-protocol/core-sdk";
 import { Address, toHex } from "viem";
-import { account, config, NFTContractAddress, NonCommercialSocialRemixingTermsId } from "@story-scripts/utils";
-import { mintNFT } from "@story-scripts/utils/mintNFT";
+import { account, config, NFTContractAddress, NonCommercialSocialRemixingTermsId } from "@story/utils";
+import { mintNFT } from "@story/utils/mintNFT";
 
 // BEFORE YOU RUN THIS FUNCTION: Make sure to read the README which contains instructions
 // for running this "Register Derivative Non-Commercial" example.

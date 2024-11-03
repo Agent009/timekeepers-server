@@ -6,9 +6,9 @@ import {
   StoryClient,
 } from "@story-protocol/core-sdk";
 import { createHash } from "crypto";
-import { NFTContractAddress, account, config, sampleIpMetadata, sampleNftMetadata } from "@story-scripts/utils";
-import { mintNFT } from "@story-scripts/utils/mintNFT";
-import { uploadJSONToIPFS } from "@story-scripts/utils/uploadToIpfs";
+import { NFTContractAddress, account, config, sampleIpMetadata, sampleNftMetadata } from "@story/utils";
+import { mintNFT } from "@story/utils/mintNFT";
+import { uploadJSONToIPFS } from "@story/utils/uploadToIpfs";
 
 // BEFORE YOU RUN THIS FUNCTION: Make sure to read the README which contains
 // instructions for running this "Simple Mint and Register" example.

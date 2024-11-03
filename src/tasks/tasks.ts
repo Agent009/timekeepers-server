@@ -2,6 +2,7 @@ import { CronJob } from "cron";
 import { constants } from "@lib/constants";
 import { isObject } from "@lib/util";
 import { fetchNewsArticles, categoriseNewsArticles } from "@tasks/newsTasks";
+import { mintNFTs } from "@tasks/nftTasks";
 
 const NEXT_SCHEDULED_NO = 1;
 const tasks: Record<string, CronJob> = {};
@@ -14,6 +15,7 @@ const commonProperties = {
 const syncInitTaskName = "syncInit";
 const fetchNewsArticlesTaskName = "fetchNewsArticles";
 const categoriseNewsArticlesTaskName = "categoriseNewsArticles";
+const mintNFTsTaskName = "mintNFTs";
 const taskMonitorTaskName = "taskMonitor";
 /**
  * If set to TRUE, it means we want to set up the initial data, so we should run all the sync tasks turn by turn and
@@ -36,6 +38,11 @@ const initTasksDefinition = {
   },
   [fetchNewsArticlesTaskName]: {
     order: 2,
+    ...initTasksDefinitionCommonParams,
+    cronSeconds: 0,
+  },
+  [mintNFTsTaskName]: {
+    order: 3,
     ...initTasksDefinitionCommonParams,
     cronSeconds: 0,
   },
@@ -151,6 +158,28 @@ tasks[fetchNewsArticlesTaskName] = fetchNewsArticlesTask; // Usually takes about
 
 //endregion
 
+//region Tasks - NFTs
+//==========))) TASKS - NFTS (((==========\\
+const mintNFTsTask = CronJob.from({
+  cronTime: constants.tasks.MINT_NFTS_CRON,
+  onTick: async function () {
+    console.log("==========))) BEGIN: CRON - MINT NFTS (((==========");
+
+    if (runInitTasks) {
+      console.log("---CRON--- Skipping due to init task being set to run first.");
+      return;
+    }
+
+    await runTaskByName(mintNFTsTaskName);
+    console.log("---CRON--- Next scheduled executions: ", scheduleDatesFormatted(this.nextDates(NEXT_SCHEDULED_NO)));
+    console.log("==========))) END: CRON - MINT NFTS (((==========");
+  },
+  ...commonProperties,
+});
+tasks[mintNFTsTaskName] = mintNFTsTask; // Usually takes about x.x seconds to complete.
+
+//endregion
+
 //region Tasks - Misc
 //==========))) SUPPORTING / MISC STUFF (((==========\\
 /**
@@ -205,6 +234,9 @@ const runTaskByName = async (taskName: string): Promise<string> => {
       break;
     case fetchNewsArticlesTaskName:
       response = await fetchNewsArticles();
+      break;
+    case mintNFTsTaskName:
+      response = await mintNFTs();
       break;
   }
 

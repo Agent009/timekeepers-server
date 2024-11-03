@@ -1,6 +1,6 @@
 import { StoryClient } from "@story-protocol/core-sdk";
 import { zeroAddress } from "viem";
-import { config } from "@story-scripts/utils";
+import { config } from "@story/utils";
 
 const main = async function () {
   // 1. Set up your Story Config

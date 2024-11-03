@@ -67,6 +67,7 @@ export const constants = Object.freeze({
     SETUP_INIT_DATA: process.env.SETUP_INIT_DATA === "true" || parseInt(process.env.SETUP_INIT_DATA || "") === 1, // Do we want to run the tasks for an initial setup?
     FETCH_NEWS_ARTICLES_CRON: process.env.FETCH_NEWS_ARTICLES_CRON || "15 1 */1 * * *", //  Default: Minute 1 of every hour
     CATEGORISE_NEWS_ARTICLES_CRON: process.env.CATEGORISE_NEWS_ARTICLES_CRON || "30 */10 * * * *", //  Default: Second 30 of every 10th minute
+    MINT_NFTS_CRON: process.env.MINT_NFTS_CRON || "45 */3 * * * *", //  Default: Second 45 of every 3rd minute
   },
   misc: {
     YMD_DATE_FORMAT: "YYYY-MM-DD",
