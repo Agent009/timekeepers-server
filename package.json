@@ -16,14 +16,21 @@
     "deploy:dev": "pm2 start pm2.config.js --env dev",
     "deploy:prod": "npm run build && pm2 start pm2.config.js --env prod",
     "start": "dotenvx run -- ts-node -r tsconfig-paths/register src/server.ts",
-    "dev": "dotenvx run -- nodemon -r tsconfig-paths/register src/server.ts"
+    "dev": "dotenvx run -- nodemon -r tsconfig-paths/register src/server.ts",
+    "mint-and-register": "dotenvx run -- ts-node -r tsconfig-paths/register ./src/story/scripts/simpleMintAndRegister.ts",
+    "mint-and-register-spg": "dotenvx run -- ts-node -r tsconfig-paths/register ./src/story/scripts/simpleMintAndRegisterSpg.ts",
+    "register-deriv-non-com": "dotenvx run -- ts-node -r tsconfig-paths/register ./src/story/scripts/registerDerivativeNonCommercial.ts",
+    "register-deriv-com": "dotenvx run -- ts-node -r tsconfig-paths/register ./src/story/scripts/registerDerivativeCommercial.ts",
+    "create-spg-collection": "dotenvx run -- ts-node -r tsconfig-paths/register ./src/story/scripts/utils/createSpgNftCollection.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@ai-sdk/openai": "^0.0.68",
     "@dotenvx/dotenvx": "^1.20.0",
+    "@pinata/sdk": "^2.1.0",
     "@sendgrid/mail": "^8.1.4",
+    "@story-protocol/core-sdk": "^1.2.0-rc.1",
     "ai": "^3.4.18",
     "axios": "^1.7.7",
     "axios-retry": "^4.5.0",
@@ -40,7 +47,8 @@
     "nodemailer": "^6.9.15",
     "puppeteer": "^23.6.0",
     "tsconfig-paths": "^4.2.0",
-    "validator": "^13.12.0"
+    "validator": "^13.12.0",
+    "viem": "^2.21.40"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

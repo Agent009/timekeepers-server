@@ -18,6 +18,9 @@ const mongodbUsername = process.env.MONGODB_USERNAME;
 const mongodbPassword = process.env.MONGODB_PASSWORD;
 
 export const constants = Object.freeze({
+  account: {
+    walletPrivateKey: process.env.WALLET_PRIVATE_KEY || "",
+  },
   // Environment
   env: {
     dev: devEnv,
@@ -90,6 +93,15 @@ export const constants = Object.freeze({
         default: "default",
         streaming: "streaming",
       },
+    },
+    pinata: {
+      jwt: process.env.PINATA_JWT || "",
+    },
+    story: {
+      rpcProviderUrl: process.env.RPC_PROVIDER_URL || "https://odyssey.storyrpc.io",
+      currencyAddress: process.env.CURRENCY_ADDRESS || "0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5",
+      nftContractAddress: process.env.NFT_CONTRACT_ADDRESS || "0x041B4F29183317Fd352AE57e331154b73F8a1D73",
+      spgNftContractAddress: process.env.SPG_NFT_CONTRACT_ADDRESS || "0xfE265a91dBe911db06999019228a678b86C04959",
     },
   },
 });
