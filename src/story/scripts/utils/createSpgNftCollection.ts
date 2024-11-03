@@ -18,9 +18,9 @@ const main = async function () {
   // you can use it in SPG functions.
   //
   const newCollection = await client.nftClient.createNFTCollection({
-    name: "Test NFT",
-    symbol: "TEST",
-    isPublicMinting: true,
+    name: "Timekeepers Epochs - World News",
+    symbol: "TKE-WN",
+    isPublicMinting: false,
     mintOpen: true,
     mintFeeRecipient: zeroAddress,
     contractURI: "",
@@ -31,6 +31,7 @@ const main = async function () {
     `New SPG NFT collection created at transaction hash ${newCollection.txHash}`,
     `NFT contract address: ${newCollection.spgNftContract}`,
   );
+  console.log("createSpgNftCollection -> newCollection", newCollection);
 };
 
 main();

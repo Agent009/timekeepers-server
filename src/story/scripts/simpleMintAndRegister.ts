@@ -6,7 +6,7 @@ import {
   StoryClient,
 } from "@story-protocol/core-sdk";
 import { createHash } from "crypto";
-import { NFTContractAddress, account, config } from "@story-scripts/utils";
+import { NFTContractAddress, account, config, sampleIpMetadata, sampleNftMetadata } from "@story-scripts/utils";
 import { mintNFT } from "@story-scripts/utils/mintNFT";
 import { uploadJSONToIPFS } from "@story-scripts/utils/uploadToIpfs";
 
@@ -22,35 +22,22 @@ const main = async function () {
   // 2. Set up your IP Metadata
   //
   // Docs: https://docs.story.foundation/docs/ipa-metadata-standard
-  const ipMetadata: IpMetadata = client.ipAsset.generateIpMetadata({
-    title: "Timekeepers IP Asset",
-    description: "This is a timekeepers IP asset",
-    attributes: [
-      {
-        key: "Rarity",
-        value: "Legendary",
-      },
-    ],
-  });
+  const ipMetadata: IpMetadata = client.ipAsset.generateIpMetadata(sampleIpMetadata);
 
   // 3. Set up your NFT Metadata
   //
   // Docs: https://eips.ethereum.org/EIPS/eip-721
-  const nftMetadata = {
-    name: "NFT representing ownership of IP Asset",
-    description: "This NFT represents ownership of an IP Asset",
-    image: "https://i.imgur.com/gb59b2S.png",
-  };
+  const nftMetadata = sampleNftMetadata;
 
   // 4. Upload your IP and NFT Metadata to IPFS
-  const ipIpfsHash = await uploadJSONToIPFS(ipMetadata);
+  const ipIpfsHash = await uploadJSONToIPFS("TK_Minute_2024-10-27_23_38_0 - NFT IP Metadata", ipMetadata);
   const ipHash = createHash("sha256").update(JSON.stringify(ipMetadata)).digest("hex");
-  const nftIpfsHash = await uploadJSONToIPFS(nftMetadata);
+  const nftIpfsHash = await uploadJSONToIPFS("TK_Minute_2024-10-27_23_38_0 - NFT Metadata", nftMetadata);
   const nftHash = createHash("sha256").update(JSON.stringify(nftMetadata)).digest("hex");
 
   // 5. Mint an NFT
   const tokenId = await mintNFT(account.address, `https://ipfs.io/ipfs/${nftIpfsHash}`);
-  console.log(`NFT minted with tokenId ${tokenId}`);
+  console.log(`simpleMintAndRegister -> NFT minted with tokenId ${tokenId}`);
 
   // 6. Register an IP Asset
   //
@@ -61,6 +48,7 @@ const main = async function () {
     pilType: PIL_TYPE.NON_COMMERCIAL_REMIX,
     mintingFee: 0, // empty - doesn't apply
     currency: AddressZero, // empty - doesn't apply
+    commercialRevShare: 50, // 50%
     ipMetadata: {
       ipMetadataURI: `https://ipfs.io/ipfs/${ipIpfsHash}`,
       ipMetadataHash: `0x${ipHash}`,

@@ -108,4 +108,5 @@ npm run start
 * Relocate **Livepeer** functionality from client to server.
 * Migrate to using **NestJS** for more robust enterprise support.
 * Add **Story Protocol** integration.
+  * Deploy bespoke NFT contract
 * Add **Zora Protocol** integration.

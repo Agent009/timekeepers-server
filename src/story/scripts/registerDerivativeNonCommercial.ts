@@ -32,6 +32,7 @@ const main = async function () {
   console.log(
     `Root IPA created at transaction hash ${registeredIpResponse.txHash}, IPA ID: ${registeredIpResponse.ipId}`,
   );
+  console.log("registerDerivativeNonCommercial -> registeredIpResponse", registeredIpResponse);
 
   // 3. Register a Derivative IP Asset
   //
@@ -59,6 +60,7 @@ const main = async function () {
   console.log(
     `Derivative IPA created at transaction hash ${registeredIpDerivativeResponse.txHash}, IPA ID: ${registeredIpDerivativeResponse.ipId}`,
   );
+  console.log("registerDerivativeNonCommercial -> registeredIpDerivativeResponse", registeredIpDerivativeResponse);
 };
 
 main();

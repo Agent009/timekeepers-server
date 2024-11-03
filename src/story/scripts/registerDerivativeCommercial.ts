@@ -44,6 +44,7 @@ const main = async function () {
   console.log(
     `Root IPA created at transaction hash ${parentIp.txHash}, IPA ID: ${parentIp.ipId}, License Terms ID: ${parentIp.licenseTermsId}`,
   );
+  console.log("registerDerivativeCommercial -> parentIp", parentIp);
 
   // 3. Register another (child) IP Asset
   //
@@ -63,6 +64,7 @@ const main = async function () {
     txOptions: { waitForTransaction: true },
   });
   console.log(`Derivative IPA created at transaction hash ${childIp.txHash}, IPA ID: ${childIp.ipId}`);
+  console.log("registerDerivativeCommercial -> childIp", childIp);
 
   // 4. Make the Child IP Asset a Derivative of the Parent IP Asset
   //
@@ -74,6 +76,7 @@ const main = async function () {
     txOptions: { waitForTransaction: true },
   });
   console.log(`Derivative linked at transaction hash ${linkDerivativeResponse.txHash}`);
+  console.log("registerDerivativeCommercial -> linkDerivativeResponse", linkDerivativeResponse);
 
   // 5. Pay Royalty
   // NOTE: You have to approve the RoyaltyModule to spend 2 SUSD on your behalf first. See README for instructions.
@@ -87,6 +90,7 @@ const main = async function () {
     txOptions: { waitForTransaction: true },
   });
   console.log(`Paid royalty at transaction hash ${payRoyalty.txHash}`);
+  console.log("registerDerivativeCommercial -> payRoyalty", payRoyalty);
 
   // 6. Claim Revenue
   //
@@ -106,6 +110,7 @@ const main = async function () {
       txOptions: { waitForTransaction: true },
     });
   console.log(`Claimed revenue: ${claimRevenue.amountsClaimed} at snapshotId ${claimRevenue.snapshotId}`);
+  console.log("registerDerivativeCommercial -> claimRevenue", claimRevenue);
 };
 
 main();
